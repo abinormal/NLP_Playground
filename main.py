@@ -142,7 +142,7 @@ def command_line():
     # Get info for the output
     currentDT = datetime.datetime.now()
     info = "<p>On the {} at {}, the top {} interesting words were found in the directory '{}' in these files:</p>".format(
-        currentDT.strftime("%Y-%m-%d"), currentDT.strftime("%H:%M"), numResults, inputDir)
+        currentDT.strftime("%dth of %B %Y"), currentDT.strftime("%I:%M"), numResults, inputDir)
     info += "<ul>"
     for f in fileList:
         info += "<li>" + ntpath.basename(f) + "</li>"
