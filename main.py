@@ -73,12 +73,20 @@ def get_most_frequent(allWords, numResults):
     return mostFrequent
 
 
+def read_file(file_name):
+    try:
+        with open(file_name, encoding="utf8") as f:
+            string = f.read()
+        return string
+    except IOError as error:
+        print("Something went wrong")
+
+
 def get_all_words(files):
     # Returns all words from a file
     words = []
     for currentFile in files:
-        with open(currentFile, encoding="utf8") as f:
-            string = f.read()
+        string = read_file(currentFile)
         words += (clean_string(string))
     return words
 
@@ -87,8 +95,7 @@ def get_files_sentences(files, words):
     # Return a dictionary of all files and strings where word is found
     d = {}
     for currentFile in files:
-        with open(currentFile, encoding="utf8") as f:
-            fileString = f.read()
+        fileString = read_file(currentFile)
         sentences = sent_tokenize(fileString)
         for word in words:
             for sentence in sentences:
