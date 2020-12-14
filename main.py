@@ -15,7 +15,7 @@ import nltk
 # nltk.download()  # uncomment to download nltk packages - only once
 
 
-def fGetWordnetPos(word):
+def get_wordnet_pos(word):
     # Map POS tag to first character lemmatize() accepts
     tag = nltk.pos_tag([word])[0][1][0].upper()
     tagDict = {"J": wordnet.ADJ,
@@ -26,24 +26,24 @@ def fGetWordnetPos(word):
     return tagDict.get(tag, wordnet.NOUN)
 
 
-def fLemmatize(string):
+def lemmatize(string):
     # Returns lemmatized token list
     lemmatizer = WordNetLemmatizer()
-    tokens = ([lemmatizer.lemmatize(w, fGetWordnetPos(w))
+    tokens = ([lemmatizer.lemmatize(w, get_wordnet_pos(w))
                for w in word_tokenize(string)])
     return tokens
 
 
-def fCleanString(fileContents):
+def clean_string(fileContents):
     # Make lower case, remove punctuation, lemmatize, split into token and remove stop words
     fileContents = fileContents.lower()
     string = re.sub(r'\W+', ' ', fileContents)
-    tokens = fLemmatize(string)
+    tokens = lemmatize(string)
     # Remove stopwords
-    return fStopWords(tokens)
+    return stop_words(tokens)
 
 
-def fStopWords(words):
+def stop_words(words):
     # Removes stop words
     stop_words = set(stopwords.words('english'))
     # Add more words to the list
@@ -59,7 +59,7 @@ def fStopWords(words):
     return filteredWords
 
 
-def fGetMostFrequent(allWords, numResults):
+def get_most_frequent(allWords, numResults):
     # Returns a Dictionary of word, number
     freq = nltk.FreqDist(allWords)
     # Sort by value in decending order
@@ -73,17 +73,17 @@ def fGetMostFrequent(allWords, numResults):
     return mostFrequent
 
 
-def fGetAllWords(files):
+def get_all_words(files):
     # Returns all words from a file
     words = []
     for currentFile in files:
         with open(currentFile, encoding="utf8") as f:
             string = f.read()
-        words += (fCleanString(string))
+        words += (clean_string(string))
     return words
 
 
-def fGetFilesSentences(files, words):
+def get_files_sentences(files, words):
     # Return a dictionary of all files and strings where word is found
     d = {}
     for currentFile in files:
@@ -103,8 +103,7 @@ def fGetFilesSentences(files, words):
     return d
 
 
-def main():
-    # CLI
+def command_line():
     parser = ArgumentParser(
         description='Given a directory, pull out the interesting words and display')
     parser.add_argument("directory", type=str,
@@ -131,13 +130,18 @@ def main():
 
     print("Using '{}' the top {} interesting words can be found in '{}.html'".format(
         inputDir, numResults, outputName))
+    return fileList, numResults, outputName
 
+
+def main():
+    # get user instructions
+    fileList, numResults, outputName = command_line()
     # Process files:
     # Get number(numResults) of most frequent results
-    frequentWords = fGetMostFrequent(fGetAllWords(fileList), numResults)
+    frequentWords = get_most_frequent(get_all_words(fileList), numResults)
 
     # Extract locations and sentences
-    dResults = fGetFilesSentences(fileList, frequentWords)
+    dResults = get_files_sentences(fileList, frequentWords)
 
     # Create table:
     table = ''
