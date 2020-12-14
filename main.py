@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 # Main python file to get contents of text files and output the most frequent "interesting words"
 
 from page import head, tail
@@ -101,68 +103,72 @@ def fGetFilesSentences(files, words):
     return d
 
 
-# CLI
-parser = ArgumentParser(
-    description='Given a directory, pull out the interesting words and display')
-parser.add_argument("directory", type=str,
-                    help="Name of the directory")  # Not optional
-parser.add_argument("-o", "--output", dest="output", type=str,
-                    help="Name of the output file", default="interesting")  # optional
-parser.add_argument("-n", "--results", dest="results", type=int,
-                    help="Number of interesting words to output", default=5)  # optional
+def main():
+    # CLI
+    parser = ArgumentParser(
+        description='Given a directory, pull out the interesting words and display')
+    parser.add_argument("directory", type=str,
+                        help="Name of the directory")  # Not optional
+    parser.add_argument("-o", "--output", dest="output", type=str,
+                        help="Name of the output file", default="interesting")  # optional
+    parser.add_argument("-n", "--results", dest="results", type=int,
+                        help="Number of interesting words to output", default=5)  # optional
 
-args = parser.parse_args()
-inputDir = args.directory
-outputName = args.output
-numResults = args.results
-if not (path.exists(inputDir)):
-    print("Directory not found")
-    sys.exit()
+    args = parser.parse_args()
+    inputDir = args.directory
+    outputName = args.output
+    numResults = args.results
+    if not (path.exists(inputDir)):
+        print("Directory not found")
+        sys.exit()
 
-# Get all text files in the directory
-fileList = glob.glob(".\{0}\*.txt".format(inputDir))
+    # Get all text files in the directory
+    fileList = glob.glob(".\{0}\*.txt".format(inputDir))
 
-if not (fileList):
-    print("Only accepts text files")
-    sys.exit()
+    if not (fileList):
+        print("Only accepts text files")
+        sys.exit()
 
-print("Using '{}' the top {} interesting words can be found in '{}.html'".format(
-    inputDir, numResults, outputName))
+    print("Using '{}' the top {} interesting words can be found in '{}.html'".format(
+        inputDir, numResults, outputName))
 
-# Process files:
-# Get number(numResults) of most frequent results
-frequentWords = fGetMostFrequent(fGetAllWords(fileList), numResults)
+    # Process files:
+    # Get number(numResults) of most frequent results
+    frequentWords = fGetMostFrequent(fGetAllWords(fileList), numResults)
 
-# Extract locations and sentences
-dResults = fGetFilesSentences(fileList, frequentWords)
+    # Extract locations and sentences
+    dResults = fGetFilesSentences(fileList, frequentWords)
+
+    # Create table:
+    table = ''
+    for word in frequentWords:
+        setoffiles = set()
+        setofsentences = set()
+        # start row + 1st column <tr><td>word(frequency)</td> ..
+        table += '''<tr><td>{} ({})</td>'''.format(word[0], word[1])
+        fileSentence = (dResults.get(word[0]))
+        for fs in fileSentence:
+            setoffiles.add(fs[0][0])
+            setofsentences.add(fs[1][0])
+        # 2nd column <td><p>filenames</p></td>
+        table += '''<td>'''
+        for f in setoffiles:
+            table += '''<p>{}</p>'''.format(f)
+        table += '''</td>'''
+        # 3rd column <td><p>sentences</p></td>
+        table += '''<td>'''
+        for s in setofsentences:
+            table += '''<p>{}</p>'''.format(s)
+        table += '''</td>'''
+        # end of row
+        table += '''</tr>'''
+
+    # Open new file, write doc to it and close
+    destinationFile = outputName+".html"
+    f = open(destinationFile, "w")
+    f.write(head+table+tail)
+    f.close()
 
 
-# Create table:
-table = ''
-for word in frequentWords:
-    setoffiles = set()
-    setofsentences = set()
-    # start row + 1st column <tr><td>word(frequency)</td> ..
-    table += '''<tr><td>{} ({})</td>'''.format(word[0], word[1])
-    fileSentence = (dResults.get(word[0]))
-    for fs in fileSentence:
-        setoffiles.add(fs[0][0])
-        setofsentences.add(fs[1][0])
-    # 2nd column <td><p>filenames</p></td>
-    table += '''<td>'''
-    for f in setoffiles:
-        table += '''<p>{}</p>'''.format(f)
-    table += '''</td>'''
-    # 3rd column <td><p>sentences</p></td>
-    table += '''<td>'''
-    for s in setofsentences:
-        table += '''<p>{}</p>'''.format(s)
-    table += '''</td>'''
-    # end of row
-    table += '''</tr>'''
-
-# Open new file, write doc to it and close
-destinationFile = outputName+".html"
-f = open(destinationFile, "w")
-f.write(head+table+tail)
-f.close()
+if __name__ == "__main__":
+    main()
