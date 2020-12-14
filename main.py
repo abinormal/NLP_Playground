@@ -128,8 +128,8 @@ def command_line():
         print("Directory not found")
         sys.exit()
 
-    # Get all text files in the directory
-    fileList = glob.glob(".\{0}\*.txt".format(inputDir))
+    filePath = path.join(".", inputDir, "*.txt")
+    fileList = glob.glob(filePath)
 
     if not (fileList):
         print("Only accepts text files")
