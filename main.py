@@ -158,6 +158,13 @@ def main():
     # Get number(numResults) of most frequent results
     frequentWords = get_most_frequent(get_all_words(fileList), numResults)
 
+    # Add more information to the output
+    info += "<p>The most frequent interesting words found are: </p><ol>"
+    for w in frequentWords:
+        info += '''<li><a href="#{}">{}({})</a></li>'''.format(
+            w[0], w[0], w[1])
+    info += "</ol>"
+
     # Extract locations and sentences
     dResults = get_files_sentences(fileList, frequentWords)
 
@@ -167,7 +174,8 @@ def main():
         setoffiles = set()
         setofsentences = set()
         # start row + 1st column <tr><td>word(frequency)</td> ..
-        table += '''<tr><td>{} ({})</td>'''.format(word[0], word[1])
+        table += '''<tr><td id="{}">{} ({})</td>'''.format(
+            word[0], word[0], word[1])
         fileSentence = (dResults.get(word[0]))
         for fs in fileSentence:
             setoffiles.add(fs[0][0])
