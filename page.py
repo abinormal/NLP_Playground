@@ -45,6 +45,8 @@ head = '''
     </head>
     <body>
         <h1>The most frequent interesting words</h1>
+'''
+middle = '''        
         <table>
             <thead>
                 <tr>

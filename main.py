@@ -2,12 +2,14 @@
 
 # Main python file to get contents of text files and output the most frequent "interesting words"
 
-from page import head, tail
+import datetime
+from page import head, middle, tail
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords, wordnet
 from argparse import ArgumentParser
 from os import path
+import ntpath
 import sys
 import glob
 import re
@@ -137,12 +139,21 @@ def command_line():
 
     print("Using '{}' the top {} interesting words can be found in '{}.html'".format(
         inputDir, numResults, outputName))
-    return fileList, numResults, outputName
+    # Get info for the output
+    currentDT = datetime.datetime.now()
+    info = "<p>On the {} at {}, the top {} interesting words were found in the directory '{}' in these files:</p>".format(
+        currentDT.strftime("%Y-%m-%d"), currentDT.strftime("%H:%M"), numResults, inputDir)
+    info += "<ul>"
+    for f in fileList:
+        info += "<li>" + ntpath.basename(f) + "</li>"
+    info += "</ul>"
+
+    return info, fileList, numResults, outputName
 
 
 def main():
     # get user instructions
-    fileList, numResults, outputName = command_line()
+    info, fileList, numResults, outputName = command_line()
     # Process files:
     # Get number(numResults) of most frequent results
     frequentWords = get_most_frequent(get_all_words(fileList), numResults)
@@ -177,7 +188,7 @@ def main():
     # Open new file, write doc to it and close
     destinationFile = outputName+".html"
     f = open(destinationFile, "w")
-    f.write(head+table+tail)
+    f.write(head+info+middle+table+tail)
     f.close()
 
 
