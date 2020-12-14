@@ -79,7 +79,7 @@ def read_file(file_name):
             string = f.read()
         return string
     except IOError as error:
-        print("Something went wrong")
+        print("Caught IOError: {}".format(error))
 
 
 def get_all_words(files):
