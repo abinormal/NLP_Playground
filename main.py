@@ -174,7 +174,7 @@ def main():
         setoffiles = set()
         setofsentences = set()
         # start row + 1st column <tr><td>word(frequency)</td> ..
-        table += '''<tr id="{}"><td ><h3>{} ({})</h3><p><a href="#top">Back</a></p></td>'''.format(
+        table += '''<tr ><td ><h3><span id = "{}"></span>{} ({})</h3><p><a href="#top">Back</a></p></td>'''.format(
             word[0], word[0], word[1])
         fileSentence = (dResults.get(word[0]))
         for fs in fileSentence:
