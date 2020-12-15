@@ -43,7 +43,7 @@ head = '''
 
         </style>
     </head>
-    <body>
+    <body id="top">
         <h1>The most frequent interesting words</h1>
 '''
 middle = '''        
