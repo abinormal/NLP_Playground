@@ -9,6 +9,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords, wordnet
 from argparse import ArgumentParser
 from os import path
+import webbrowser
 import ntpath
 import sys
 import glob
@@ -198,6 +199,8 @@ def main():
     f = open(destinationFile, "w")
     f.write(head+info+middle+table+tail)
     f.close()
+    print("Opening generated file '{}'".format(destinationFile))
+    webbrowser.open_new_tab(destinationFile)
 
 
 if __name__ == "__main__":
