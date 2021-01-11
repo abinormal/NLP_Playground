@@ -115,7 +115,7 @@ def get_files_sentences(files, words):
 
 def command_line():
     parser = ArgumentParser(
-        description='Given a directory, pull out the interesting words and display')
+        description='Given a directory of .txt files, pull out the interesting words and display in HTML.')
     parser.add_argument("directory", type=str,
                         help="Name of the directory")  # Not optional
     parser.add_argument("-o", "--output", dest="output", type=str,
@@ -138,7 +138,7 @@ def command_line():
         print("Only accepts text files")
         sys.exit()
 
-    print("Using '{}' the top {} interesting words can be found in '{}.html'".format(
+    print("Using '{}' the top {} interesting words can be found in '{}.html'. This will open automatically once processed".format(
         inputDir, numResults, outputName))
     # Get info for the output
     currentDT = datetime.datetime.now()
@@ -163,7 +163,7 @@ def main():
     info += "<p>The most frequent interesting words found are: </p><ol>"
     for w in frequentWords:
         info += '''<li><a href="#{}">{}({})</a></li>'''.format(
-            w[0], w[0], w[1])
+            w[0], w[0].capitalize(), w[1])
     info += "</ol>"
 
     # Extract locations and sentences
@@ -176,7 +176,7 @@ def main():
         setofsentences = set()
         # start row + 1st column <tr><td>word(frequency)</td> ..
         table += '''<tr ><td ><h3><span id = "{}"></span>{} ({})</h3><p><a href="#top">Back</a></p></td>'''.format(
-            word[0], word[0], word[1])
+            word[0], word[0].capitalize(), word[1])
         fileSentence = (dResults.get(word[0]))
         for fs in fileSentence:
             setoffiles.add(fs[0][0])
