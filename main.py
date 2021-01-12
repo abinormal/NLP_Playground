@@ -106,8 +106,12 @@ def get_files_sentences(files, words):
                 pattern = r'(?i)\b{}\b'.format(word[0])
                 # TODO - Wrap <b></b> around the found word
                 if (re.findall(pattern, sentence)):
+                    # Alter sentence to put <b> tags round the word
+                    src_str = re.compile(word[0], re.IGNORECASE)
+                    sentence = src_str.sub("<b>"+word[0]+"</b>", sentence)
                     # strip the filename from the path
                     fpath, ftail = path.split(currentFile)
+                    # Add info to dict
                     d.setdefault(word[0], []).append(
                         [[ftail], [sentence.strip()]])
     return d
