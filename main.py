@@ -1,14 +1,16 @@
 #! /usr/bin/env python3
 
-# Main python file to get contents of text files and output the most frequent "interesting words"
+# main.py - Get contents of text files and output the most frequent "interesting" words to an HTML file
+# Author  - Abigail Sidford
+# Date    - November 2020
 
-import datetime
 from page import head, middle, tail
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords, wordnet
 from argparse import ArgumentParser
 from os import path
+import datetime
 import webbrowser
 import ntpath
 import sys
@@ -25,7 +27,6 @@ def get_wordnet_pos(word):
                "N": wordnet.NOUN,
                "V": wordnet.VERB,
                "R": wordnet.ADV}
-
     return tagDict.get(tag, wordnet.NOUN)
 
 
@@ -38,7 +39,7 @@ def lemmatize(string):
 
 
 def clean_string(fileContents):
-    # Make lower case, remove punctuation, lemmatize, split into token and remove stop words
+    # Make lower case, remove punctuation, lemmatize, split into tokens and remove stop words
     fileContents = fileContents.lower()
     string = re.sub(r'\W+', ' ', fileContents)
     tokens = lemmatize(string)
@@ -63,7 +64,7 @@ def stop_words(words):
 
 
 def get_most_frequent(allWords, numResults):
-    # Returns a Dictionary of word, number
+    # Returns a Dictionary of size numResults containing of word and number
     freq = nltk.FreqDist(allWords)
     # Sort by value in decending order
     interestingWords = []
@@ -77,6 +78,7 @@ def get_most_frequent(allWords, numResults):
 
 
 def read_file(file_name):
+    # Open given file within try-except, on success return string
     try:
         with open(file_name, encoding="utf8") as f:
             string = f.read()
@@ -104,14 +106,13 @@ def get_files_sentences(files, words):
             for sentence in sentences:
                 # (?i) - case insensitive match
                 pattern = r'(?i)\b{}\b'.format(word[0])
-                # TODO - Wrap <b></b> around the found word
+                # Find word in sentence and add to dict
                 if (re.findall(pattern, sentence)):
                     # Alter sentence to put <b> tags round the word
                     src_str = re.compile(word[0], re.IGNORECASE)
                     sentence = src_str.sub("<b>"+word[0]+"</b>", sentence)
                     # strip the filename from the path
                     fpath, ftail = path.split(currentFile)
-                    # Add info to dict
                     d.setdefault(word[0], []).append(
                         [[ftail], [sentence.strip()]])
     return d
@@ -142,9 +143,10 @@ def command_line():
         print("Only accepts text files")
         sys.exit()
 
-    print("Using '{}' the top {} interesting words can be found in '{}.html'. This will open automatically once processed".format(
+    print("Using '{}' the top {} interesting words can be found in '{}.html'.".format(
         inputDir, numResults, outputName))
-    # Get info for the output
+    print("This will open automatically once processed.")
+    # Get info to add to the output
     currentDT = datetime.datetime.now()
     info = "<p>On the {} at {}, the top {} interesting words were found in the directory '{}' in these files:</p>".format(
         currentDT.strftime("%dth of %B %Y"), currentDT.strftime("%I:%M"), numResults, inputDir)
@@ -156,24 +158,7 @@ def command_line():
     return info, fileList, numResults, outputName
 
 
-def main():
-    # get user instructions
-    info, fileList, numResults, outputName = command_line()
-    # Process files:
-    # Get number(numResults) of most frequent results
-    frequentWords = get_most_frequent(get_all_words(fileList), numResults)
-
-    # Add more information to the output
-    info += "<p>The most frequent interesting words found are: </p><ol>"
-    for w in frequentWords:
-        info += '''<li><a href="#{}">{}({})</a></li>'''.format(
-            w[0], w[0].capitalize(), w[1])
-    info += "</ol>"
-
-    # Extract locations and sentences
-    dResults = get_files_sentences(fileList, frequentWords)
-
-    # Create table:
+def create_table(frequentWords, dResults):
     table = ''
     for word in frequentWords:
         setoffiles = set()
@@ -197,6 +182,28 @@ def main():
         table += '''</td>'''
         # end of row
         table += '''</tr>'''
+    return table
+
+
+def main():
+    # get user instructions
+    info, fileList, numResults, outputName = command_line()
+    # Process files:
+    # Get number(numResults) of most frequent results
+    frequentWords = get_most_frequent(get_all_words(fileList), numResults)
+
+    # Add more information to the output
+    info += "<p>The most frequent interesting words found are: </p><ol>"
+    for w in frequentWords:
+        info += '''<li><a href="#{}">{}({})</a></li>'''.format(
+            w[0], w[0].capitalize(), w[1])
+    info += "</ol>"
+
+    # Extract locations and sentences
+    dResults = get_files_sentences(fileList, frequentWords)
+
+    # Create table:
+    table = create_table(frequentWords, dResults)
 
     # Open new file, write doc to it and close
     destinationFile = outputName+".html"
